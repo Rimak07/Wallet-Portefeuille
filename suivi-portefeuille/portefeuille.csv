@@ -1,0 +1,11 @@
+# EXEMPLE FICTIF : remplace ces lignes par tes vrais titres.
+# Colonnes : ticker, nom, secteur, quantite, prix_achat, devise, prix_manuel
+# - prix_manuel est facultatif : il sert seulement si le prix du marché est introuvable.
+# - Les tickers canadiens finissent par .TO (ex. RY.TO). Les décimales peuvent être , ou .
+ticker,nom,secteur,quantite,prix_achat,devise,prix_manuel
+AAPL,Apple,Technologie,10,150.00,USD,
+MSFT,Microsoft,Technologie,5,380.00,USD,
+JNJ,Johnson & Johnson,Santé,8,160.00,USD,
+XOM,Exxon Mobil,Énergie,12,100.00,USD,
+RY.TO,Banque Royale,Finance,15,120.00,CAD,
+ENB.TO,Enbridge,Énergie,40,48.00,CAD,

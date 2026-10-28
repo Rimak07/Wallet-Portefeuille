@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-28",
+  "mode": "marché",
+  "devise": "CAD",
+  "valeur_totale": 21627.562358872383,
+  "positions": {
+    "AAPL": {
+      "quantite": 10.0,
+      "prix": 343.8299865722656,
+      "devise": "USD",
+      "valeur": 4810.834613889747,
+      "poids": 22.243998348321366,
+      "secteur": "Technologie",
+      "source_prix": "marché"
+    },
+    "MSFT": {
+      "quantite": 5.0,
+      "prix": 531.010009765625,
+      "devise": "USD",
+      "valeur": 3714.9193425069097,
+      "poids": 17.176782481835822,
+      "secteur": "Technologie",
+      "source_prix": "marché"
+    },
+    "JNJ": {
+      "quantite": 8.0,
+      "prix": 271.0400085449219,
+      "devise": "USD",
+      "valeur": 3033.891645940719,
+      "poids": 14.027894570818844,
+      "secteur": "Santé",
+      "source_prix": "marché"
+    },
+    "XOM": {
+      "quantite": 12.0,
+      "prix": 182.02000427246094,
+      "devise": "USD",
+      "valeur": 3056.166726017429,
+      "poids": 14.130888517649714,
+      "secteur": "Énergie",
+      "source_prix": "marché"
+    },
+    "RY.TO": {
+      "quantite": 15.0,
+      "prix": 286.4100036621094,
+      "devise": "CAD",
+      "valeur": 4296.150054931641,
+      "poids": 19.864236124461847,
+      "secteur": "Finance",
+      "source_prix": "marché"
+    },
+    "ENB.TO": {
+      "quantite": 40.0,
+      "prix": 67.88999938964844,
+      "devise": "CAD",
+      "valeur": 2715.5999755859375,
+      "poids": 12.556199956912403,
+      "secteur": "Énergie",
+      "source_prix": "marché"
+    }
+  },
+  "alertes": []
+}
