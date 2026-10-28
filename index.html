@@ -201,7 +201,7 @@
   function init() {
     Object.values(DATA.tickers).forEach(t => t.dates = Object.keys(t.prix).sort());
     DATA.fxDates = Object.keys(DATA.fx).sort();
-    const premiere = DATA.fxDates[0], derniere = DATA.maj;
+    const premiere = Object.values(DATA.tickers).map(t => t.dates[0]).sort()[0], derniere = DATA.maj;
     const sel = $("titre");
     Object.entries(DATA.tickers).forEach(([sym, t]) => {
       const o = document.createElement("option");
@@ -222,11 +222,24 @@
     render();
   }
 
-  fetch("prix.json", { cache: "no-store" })
-    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(d => { DATA = d; init(); })
-    .catch(() => {
-      $("maj").textContent = "Les prix n’ont pas pu être chargés (fichier prix.json introuvable). Voir les étapes de mise en place.";
+  async function chargerPrix() {
+    for (const chemin of ["prix.json", "suivi-portefeuille/prix.json", "../prix.json"]) {
+      try {
+        const r = await fetch(chemin, { cache: "no-store" });
+        if (r.ok) return await r.json();
+      } catch (e) {}
+    }
+    throw new Error("prix.json introuvable depuis l’adresse " + location.pathname);
+  }
+
+  chargerPrix()
+    .then(d => {
+      DATA = d;
+      DATA.fx = DATA.fx || {};
+      try { init(); } catch (e) { throw new Error("erreur dans la page : " + e.message); }
+    })
+    .catch(e => {
+      $("maj").textContent = "Impossible d’afficher les prix. Détail : " + e.message;
       $("maj").className = "error";
     });
 </script>
