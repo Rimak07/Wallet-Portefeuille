@@ -3,511 +3,232 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Un tableau de bord simple pour suivre un portefeuille.">
-  <title>Mon portefeuille</title>
+  <title>Simulateur de portefeuille</title>
   <style>
     :root {
       color-scheme: light dark;
-      --text: #17211d;
-      --bg: #f3f6f4;
-      --surface: #ffffff;
-      --border: #e0e8e2;
-      --border-soft: #edf1ee;
-      --border-input: #d5e0d8;
-      --muted: #5b6861;
-      --accent: #287353;
-      --accent-hover: #205d43;
-      --accent-soft: #f1f7f3;
-      --btn-text: #234b36;
-      --focus: #8cc9a5;
-      --danger: #8d3939;
-      --danger-border: #eddada;
-      --danger-soft: #fff5f5;
-      --positive: #287353;
-      --negative: #b44444;
-      --shadow: rgb(26 51 37 / 4%);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      font-synthesis: none;
+      --text:#17211d; --bg:#f3f6f4; --surface:#fff; --border:#e0e8e2; --muted:#5b6861;
+      --accent:#287353; --pos:#287353; --neg:#b44444; --focus:#8cc9a5;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      color:var(--text); background:var(--bg);
     }
-
     @media (prefers-color-scheme: dark) {
-      :root {
-        --text: #e6eee9;
-        --bg: #101613;
-        --surface: #18211c;
-        --border: #26332b;
-        --border-soft: #202b25;
-        --border-input: #34453b;
-        --muted: #9aa8a0;
-        --accent: #3fa578;
-        --accent-hover: #4dba8a;
-        --accent-soft: #1f2d25;
-        --btn-text: #bfe3cf;
-        --focus: #3fa578;
-        --danger: #e08a8a;
-        --danger-border: #4a2f2f;
-        --danger-soft: #2a1c1c;
-        --positive: #5fcf9a;
-        --negative: #e07a7a;
-        --shadow: rgb(0 0 0 / 30%);
-      }
+      :root { --text:#e6eee9; --bg:#101613; --surface:#18211c; --border:#26332b; --muted:#9aa8a0;
+        --accent:#3fa578; --pos:#5fcf9a; --neg:#e07a7a; --focus:#3fa578; }
     }
-
-    * { box-sizing: border-box; }
-
-    body { margin: 0; color: var(--text); background: var(--bg); }
-
-    main {
-      width: min(100% - 32px, 980px);
-      margin: 56px auto;
-    }
-
-    header { margin-bottom: 28px; }
-
-    .eyebrow {
-      margin: 0 0 8px;
-      color: var(--accent);
-      font-size: 0.78rem;
-      font-weight: 750;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2rem, 5vw, 3rem);
-      letter-spacing: -0.045em;
-    }
-
-    header p:last-child {
-      max-width: 620px;
-      margin: 12px 0 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .card, .portfolio {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: var(--surface);
-      box-shadow: 0 8px 28px var(--shadow);
-    }
-
-    .card { padding: 20px; }
-
-    .card-label {
-      display: block;
-      margin-bottom: 10px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .card strong {
-      display: block;
-      overflow-wrap: anywhere;
-      font-size: clamp(1.25rem, 3vw, 1.8rem);
-      letter-spacing: -0.035em;
-    }
-
-    .portfolio { overflow: hidden; }
-
-    .portfolio-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 20px 22px;
-      border-bottom: 1px solid var(--border-soft);
-    }
-
-    h2 { margin: 0; font-size: 1.15rem; }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 9px; }
-
-    button {
-      min-height: 40px;
-      padding: 9px 14px;
-      border: 1px solid var(--border-input);
-      border-radius: 9px;
-      color: var(--btn-text);
-      background: var(--surface);
-      font: inherit;
-      font-size: 0.9rem;
-      font-weight: 650;
-      cursor: pointer;
-    }
-
-    button:hover { background: var(--accent-soft); }
-    button:focus-visible, input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-
-    .primary {
-      border-color: var(--accent);
-      color: #fff;
-      background: var(--accent);
-    }
-
-    .primary:hover { background: var(--accent-hover); }
-
-    .table-wrap { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      min-width: 720px;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    th, td { padding: 13px 16px; border-bottom: 1px solid var(--border-soft); }
-
-    th {
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    td { font-size: 0.92rem; }
-    tbody tr:last-child td { border-bottom: 0; }
-    td:first-child, th:first-child { padding-left: 22px; }
-
-    input {
-      width: 100%;
-      min-width: 96px;
-      padding: 9px 10px;
-      border: 1px solid var(--border-input);
-      border-radius: 8px;
-      color: var(--text);
-      background: var(--surface);
-      font: inherit;
-    }
-
-    input[type="text"] { min-width: 110px; }
-    input::placeholder { color: var(--muted); opacity: 0.7; }
-
-    .number { text-align: right; white-space: nowrap; }
-    .number input { text-align: right; }
-
-    .remove {
-      min-height: 34px;
-      padding: 6px 9px;
-      color: var(--danger);
-      border-color: var(--danger-border);
-    }
-
-    .remove:hover { background: var(--danger-soft); }
-
-    .empty {
-      margin: 0;
-      padding: 34px 22px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    .notice {
-      margin: 14px 0 0;
-      color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.55;
-    }
-
-    .status { min-height: 1.4em; color: var(--danger); font-size: 0.88rem; }
-    .positive { color: var(--positive); }
-    .negative { color: var(--negative); }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    @media (max-width: 640px) {
-      main { margin: 32px auto; }
-      .summary { grid-template-columns: 1fr; gap: 10px; }
-      .card { padding: 16px; }
-      .portfolio-heading { align-items: flex-start; flex-direction: column; }
-    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); }
+    main { width:min(100% - 32px, 980px); margin:48px auto; }
+    h1 { margin:0 0 8px; font-size:clamp(2rem,5vw,2.8rem); letter-spacing:-.04em; }
+    h2 { margin:0 0 14px; font-size:1.1rem; }
+    p { line-height:1.55; }
+    .muted { color:var(--muted); font-size:.9rem; }
+    .panel, .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; }
+    .panel { margin-bottom:18px; }
+    .summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:18px 0; }
+    .card span { display:block; margin-bottom:8px; color:var(--muted); font-size:.9rem; }
+    .card strong { font-size:clamp(1.2rem,3vw,1.7rem); letter-spacing:-.03em; overflow-wrap:anywhere; }
+    .form { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; align-items:end; }
+    label { display:grid; gap:6px; font-size:.85rem; color:var(--muted); }
+    input, select, button { font:inherit; padding:10px; border-radius:9px; border:1px solid var(--border);
+      background:var(--surface); color:var(--text); min-height:42px; }
+    button { cursor:pointer; font-weight:650; }
+    button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+    input:focus-visible, select:focus-visible, button:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+    .view { display:flex; flex-wrap:wrap; gap:12px; align-items:end; justify-content:space-between; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; min-width:640px; border-collapse:collapse; text-align:left; }
+    th, td { padding:11px 10px; border-bottom:1px solid var(--border); font-size:.92rem; }
+    th { color:var(--muted); font-size:.8rem; }
+    .num { text-align:right; white-space:nowrap; }
+    .pos { color:var(--pos); } .neg { color:var(--neg); }
+    .error { color:var(--neg); min-height:1.4em; font-size:.9rem; }
+    svg { width:100%; height:auto; display:block; }
+    @media (max-width:640px) { .summary { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
-  <main>
-    <header>
-      <p class="eyebrow">Suivi de portefeuille</p>
-      <h1>Mon portefeuille</h1>
-      <p>Ajoutez vos titres et saisissez leurs prix pour obtenir un aperçu de leur valeur et de leur évolution.</p>
-    </header>
+<main>
+  <h1>Simulateur de portefeuille</h1>
+  <p class="muted" id="maj">Chargement des prix…</p>
 
-    <section class="summary" aria-label="Résumé du portefeuille">
-      <article class="card">
-        <span class="card-label">Valeur totale</span>
-        <strong id="total-value">0,00 $ CA</strong>
-      </article>
-      <article class="card">
-        <span class="card-label">Coût des titres renseignés</span>
-        <strong id="total-cost">—</strong>
-      </article>
-      <article class="card">
-        <span class="card-label">Gain ou perte renseigné</span>
-        <strong id="total-gain">—</strong>
-      </article>
-    </section>
+  <section class="panel" aria-labelledby="t-achat">
+    <h2 id="t-achat">Acheter (argent fictif)</h2>
+    <div class="form">
+      <label>Titre <select id="titre"></select></label>
+      <label>Date d’achat <input type="date" id="date-achat"></label>
+      <label>Montant investi (CAD) <input type="text" id="montant" inputmode="decimal" placeholder="1000"></label>
+      <button class="primary" id="acheter" type="button">Acheter</button>
+    </div>
+    <p class="error" id="erreur" role="status" aria-live="polite"></p>
+  </section>
 
-    <section class="portfolio" aria-labelledby="positions-title">
-      <div class="portfolio-heading">
-        <h2 id="positions-title">Mes positions</h2>
-        <div class="actions">
-          <button type="button" id="clear-button">Tout effacer</button>
-          <button type="button" class="primary" id="add-button">+ Ajouter un titre</button>
-        </div>
-      </div>
-      <div class="table-wrap" id="table-wrap" hidden>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Titre</th>
-              <th scope="col" class="number">Quantité</th>
-              <th scope="col" class="number">Prix actuel (CAD)</th>
-              <th scope="col" class="number">Prix d’achat (CAD)</th>
-              <th scope="col" class="number">Valeur (CAD)</th>
-              <th scope="col" class="number">Gain / perte</th>
-              <th scope="col"><span class="sr-only">Action</span></th>
-            </tr>
-          </thead>
-          <tbody id="positions"></tbody>
-        </table>
-      </div>
-      <p class="empty" id="empty-message">Aucun titre pour le moment. Cliquez sur « Ajouter un titre » pour commencer.</p>
-    </section>
+  <section class="panel view">
+    <label>Voir la valeur du portefeuille au <input type="date" id="date-vue"></label>
+    <button type="button" id="aujourdhui">Dernière date disponible</button>
+    <button type="button" id="effacer">Tout effacer</button>
+  </section>
 
-    <p class="notice">
-      Saisissez tous les prix en dollars canadiens (CAD). Les prix ne sont pas récupérés automatiquement.
-      Vos entrées sont enregistrées dans le stockage local de ce navigateur et ne sont pas envoyées à un serveur.
-    </p>
-    <p class="notice">Cette page est un outil de suivi, pas un conseil financier. Les montants sont calculés à partir des valeurs que vous saisissez.</p>
-    <p class="status" id="status" role="status" aria-live="polite"></p>
-  </main>
+  <section class="summary" aria-label="Résumé">
+    <article class="card"><span>Investi</span><strong id="s-investi">—</strong></article>
+    <article class="card"><span>Valeur à cette date</span><strong id="s-valeur">—</strong></article>
+    <article class="card"><span>Gain ou perte</span><strong id="s-gain">—</strong></article>
+  </section>
 
-  <script>
-    const storageKey = "suivi-portefeuille-positions";
-    const positionsBody = document.getElementById("positions");
-    const tableWrap = document.getElementById("table-wrap");
-    const emptyMessage = document.getElementById("empty-message");
-    const status = document.getElementById("status");
-    const currency = new Intl.NumberFormat("fr-CA", {
-      style: "currency",
-      currency: "CAD",
-      currencyDisplay: "code"
+  <section class="panel">
+    <h2>Évolution</h2>
+    <div id="graphique"><p class="muted">Fais un premier achat pour voir la courbe.</p></div>
+  </section>
+
+  <section class="panel">
+    <h2>Mes achats</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Titre</th><th>Date d’achat</th><th class="num">Investi</th>
+          <th class="num">Valeur</th><th class="num">Gain / perte</th><th></th>
+        </tr></thead>
+        <tbody id="achats"></tbody>
+      </table>
+    </div>
+    <p class="muted" id="vide">Aucun achat pour le moment.</p>
+  </section>
+
+  <p class="muted">Simulation avec de l’argent fictif, à titre informatif seulement : ce n’est pas un conseil financier. Les performances passées ne garantissent pas les résultats futurs. Les prix en USD sont convertis en CAD avec le taux du jour. Si une date tombe un jour de fermeture des marchés, le dernier prix de clôture connu est utilisé.</p>
+</main>
+
+<script>
+  const KEY = "simulateur-achats";
+  const $ = id => document.getElementById(id);
+  const money = new Intl.NumberFormat("fr-CA", { style: "currency", currency: "CAD" });
+  let DATA = null, achats = [], dateVue = "";
+
+  function dernierIndex(dates, d) {            // dernier index dont la date est <= d
+    let lo = 0, hi = dates.length - 1, r = -1;
+    while (lo <= hi) { const m = (lo + hi) >> 1; if (dates[m] <= d) { r = m; lo = m + 1; } else hi = m - 1; }
+    return r;
+  }
+
+  function prixCAD(sym, d) {
+    const t = DATA.tickers[sym], i = dernierIndex(t.dates, d);
+    if (i < 0) return null;
+    let p = t.prix[t.dates[i]];
+    if (t.devise === "USD") {
+      const j = dernierIndex(DATA.fxDates, d);
+      if (j < 0) return null;
+      p *= DATA.fx[DATA.fxDates[j]];
+    }
+    return p;
+  }
+
+  const valeurA = (a, d) => d < a.date ? 0 : a.qty * prixCAD(a.sym, d);
+  const gainClass = g => g >= 0 ? "pos" : "neg";
+
+  function lireMontant(v) {
+    const n = Number(v.trim().replace(/\s/g, "").replace(",", "."));
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }
+
+  function sauver() { try { localStorage.setItem(KEY, JSON.stringify(achats)); } catch (e) {} }
+
+  function acheter() {
+    const sym = $("titre").value, date = $("date-achat").value, montant = lireMontant($("montant").value);
+    const err = $("erreur");
+    if (!date || !montant) { err.textContent = "Choisis une date et entre un montant supérieur à 0."; return; }
+    const p = prixCAD(sym, date);
+    if (p === null) { err.textContent = "Aucun prix disponible à cette date. Choisis une date plus récente."; return; }
+    err.textContent = "";
+    achats.push({ id: Date.now() + Math.random(), sym, date, montant, qty: montant / p });
+    sauver(); render();
+  }
+
+  function render() {
+    const tbody = $("achats");
+    tbody.replaceChildren();
+    let investi = 0, valeur = 0;
+    achats.forEach(a => {
+      const row = document.createElement("tr");
+      const actif = a.date <= dateVue;
+      const v = valeurA(a, dateVue), g = v - a.montant;
+      if (actif) { investi += a.montant; valeur += v; }
+      const cells = [
+        [`${a.sym} — ${DATA.tickers[a.sym].nom}`, ""], [a.date, ""], [money.format(a.montant), "num"],
+        [actif ? money.format(v) : "—", "num"],
+        [actif ? `${money.format(g)} (${(g / a.montant * 100).toFixed(1)} %)` : "pas encore acheté", "num " + (actif ? gainClass(g) : "")]
+      ];
+      cells.forEach(([txt, cls]) => { const td = document.createElement("td"); td.textContent = txt; td.className = cls; row.append(td); });
+      const td = document.createElement("td"), b = document.createElement("button");
+      b.type = "button"; b.textContent = "Retirer";
+      b.addEventListener("click", () => { achats = achats.filter(x => x.id !== a.id); sauver(); render(); });
+      td.append(b); row.append(td); tbody.append(row);
     });
-    let positions = [];
+    $("vide").hidden = achats.length > 0;
+    $("s-investi").textContent = achats.length ? money.format(investi) : "—";
+    $("s-valeur").textContent = achats.length ? money.format(valeur) : "—";
+    const gain = $("s-gain");
+    gain.className = "";
+    if (achats.length && investi > 0) {
+      const g = valeur - investi;
+      gain.textContent = `${money.format(g)} (${(g / investi * 100).toFixed(1)} %)`;
+      gain.className = gainClass(g);
+    } else gain.textContent = "—";
+    graphique();
+  }
 
-    function newId() {
-      if (window.crypto && typeof crypto.randomUUID === "function") return crypto.randomUUID();
-      return "p-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
-    }
+  function graphique() {
+    const box = $("graphique");
+    if (!achats.length) { box.innerHTML = '<p class="muted">Fais un premier achat pour voir la courbe.</p>'; return; }
+    const debut = achats.reduce((m, a) => a.date < m ? a.date : m, achats[0].date);
+    const set = new Set();
+    achats.forEach(a => DATA.tickers[a.sym].dates.forEach(d => { if (d >= debut && d <= dateVue) set.add(d); }));
+    const dates = [...set].sort();
+    if (dates.length < 2) { box.innerHTML = '<p class="muted">Pas assez de jours pour tracer la courbe : choisis une date d’achat plus ancienne ou attends la prochaine mise à jour des prix.</p>'; return; }
+    const val = dates.map(d => achats.reduce((s, a) => s + valeurA(a, d), 0));
+    const inv = dates.map(d => achats.reduce((s, a) => s + (a.date <= d ? a.montant : 0), 0));
+    const all = val.concat(inv), min = Math.min(...all), max = Math.max(...all), W = 640, H = 220, P = 8;
+    const x = i => P + i * (W - 2 * P) / (dates.length - 1);
+    const y = v => H - 22 - (max === min ? 0 : (v - min) / (max - min) * (H - 40));
+    const pts = arr => arr.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Évolution de la valeur du portefeuille">
+      <polyline points="${pts(inv)}" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-dasharray="5 4" stroke-width="1.5"/>
+      <polyline points="${pts(val)}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+      <text x="${P}" y="${H - 4}" font-size="11" fill="currentColor" fill-opacity=".7">${dates[0]}</text>
+      <text x="${W - P}" y="${H - 4}" font-size="11" fill="currentColor" fill-opacity=".7" text-anchor="end">${dates[dates.length - 1]}</text>
+      <text x="${P}" y="12" font-size="11" fill="currentColor" fill-opacity=".7">${money.format(max)}</text></svg>
+      <p class="muted">Ligne verte : valeur du portefeuille. Ligne pointillée : montant investi.</p>`;
+  }
 
-    // Accepte la virgule ou le point comme séparateur décimal.
-    function readNumber(value) {
-      if (typeof value !== "string" || value.trim() === "") return null;
-      const number = Number(value.trim().replace(/\s/g, "").replace(",", "."));
-      return Number.isFinite(number) && number >= 0 ? number : null;
-    }
-
-    function formatMoney(value) {
-      return currency.format(value);
-    }
-
-    function savePositions() {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(positions));
-        status.textContent = "";
-      } catch (error) {
-        status.textContent = "Impossible d’enregistrer les changements dans ce navigateur.";
-      }
-    }
-
-    function createCell(row, className) {
-      const cell = document.createElement("td");
-      if (className) cell.className = className;
-      row.append(cell);
-      return cell;
-    }
-
-    function createInput(value, label, placeholder, numeric) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = value ?? "";
-      input.setAttribute("aria-label", label);
-      input.placeholder = placeholder;
-      input.autocomplete = "off";
-      if (numeric) input.inputMode = "decimal";
-      return input;
-    }
-
-    // Met à jour les cellules « Valeur » et « Gain / perte » d'une ligne.
-    function updateRowCells(position, valueCell, gainCell) {
-      const quantity = readNumber(position.quantity);
-      const currentPrice = readNumber(position.currentPrice);
-      const purchasePrice = readNumber(position.purchasePrice);
-
-      valueCell.textContent = "—";
-      gainCell.textContent = "—";
-      gainCell.classList.remove("positive", "negative");
-
-      if (quantity === null || currentPrice === null) return;
-
-      valueCell.textContent = formatMoney(quantity * currentPrice);
-      if (purchasePrice !== null) {
-        const gain = (currentPrice - purchasePrice) * quantity;
-        gainCell.textContent = formatMoney(gain);
-        gainCell.classList.add(gain >= 0 ? "positive" : "negative");
-      }
-    }
-
-    function render() {
-      positionsBody.replaceChildren();
-
-      positions.forEach(position => {
-        const row = document.createElement("tr");
-
-        const ticker = createInput(position.ticker, "Symbole du titre", "Ex. AAPL", false);
-        ticker.maxLength = 12;
-        createCell(row).append(ticker);
-
-        const quantity = createInput(position.quantity, "Quantité détenue", "0", true);
-        createCell(row, "number").append(quantity);
-
-        const currentPrice = createInput(position.currentPrice, "Prix actuel en dollars canadiens", "0,00", true);
-        createCell(row, "number").append(currentPrice);
-
-        const purchasePrice = createInput(position.purchasePrice, "Prix d’achat en dollars canadiens (facultatif)", "Facultatif", true);
-        createCell(row, "number").append(purchasePrice);
-
-        const valueCell = createCell(row, "number");
-        const gainCell = createCell(row, "number");
-
-        const remove = document.createElement("button");
-        remove.type = "button";
-        remove.className = "remove";
-        remove.textContent = "Retirer";
-        remove.setAttribute("aria-label", `Retirer ${position.ticker || "ce titre"}`);
-        createCell(row).append(remove);
-
-        function updatePosition() {
-          position.ticker = ticker.value.trim().toUpperCase();
-          position.quantity = quantity.value;
-          position.currentPrice = currentPrice.value;
-          position.purchasePrice = purchasePrice.value;
-          remove.setAttribute("aria-label", `Retirer ${position.ticker || "ce titre"}`);
-          updateRowCells(position, valueCell, gainCell);
-          updateTotals();
-          savePositions();
-        }
-
-        [ticker, quantity, currentPrice, purchasePrice].forEach(input => {
-          input.addEventListener("input", updatePosition);
-        });
-
-        remove.addEventListener("click", () => {
-          positions = positions.filter(p => p.id !== position.id);
-          savePositions();
-          render();
-        });
-
-        updateRowCells(position, valueCell, gainCell);
-        positionsBody.append(row);
-      });
-
-      const hasPositions = positions.length > 0;
-      tableWrap.hidden = !hasPositions;
-      emptyMessage.hidden = hasPositions;
-      updateTotals();
-    }
-
-    function updateTotals() {
-      let totalValue = 0;
-      let valueWithCost = 0;
-      let totalCost = 0;
-      let costCount = 0;
-
-      positions.forEach(position => {
-        const quantity = readNumber(position.quantity);
-        const currentPrice = readNumber(position.currentPrice);
-        const purchasePrice = readNumber(position.purchasePrice);
-        if (quantity === null || currentPrice === null) return;
-
-        totalValue += quantity * currentPrice;
-        if (purchasePrice !== null) {
-          valueWithCost += quantity * currentPrice;
-          totalCost += quantity * purchasePrice;
-          costCount += 1;
-        }
-      });
-
-      document.getElementById("total-value").textContent = formatMoney(totalValue);
-      const costElement = document.getElementById("total-cost");
-      const gainElement = document.getElementById("total-gain");
-      gainElement.classList.remove("positive", "negative");
-
-      if (costCount === 0) {
-        costElement.textContent = "—";
-        gainElement.textContent = "—";
-      } else {
-        const gain = valueWithCost - totalCost;
-        costElement.textContent = formatMoney(totalCost);
-        gainElement.textContent = formatMoney(gain);
-        gainElement.classList.add(gain >= 0 ? "positive" : "negative");
-      }
-    }
-
-    document.getElementById("add-button").addEventListener("click", () => {
-      positions.push({ id: newId(), ticker: "", quantity: "", currentPrice: "", purchasePrice: "" });
-      savePositions();
-      render();
-      const lastInput = positionsBody.querySelector("tr:last-child input");
-      if (lastInput) lastInput.focus();
+  function init() {
+    Object.values(DATA.tickers).forEach(t => t.dates = Object.keys(t.prix).sort());
+    DATA.fxDates = Object.keys(DATA.fx).sort();
+    const premiere = DATA.fxDates[0], derniere = DATA.maj;
+    const sel = $("titre");
+    Object.entries(DATA.tickers).forEach(([sym, t]) => {
+      const o = document.createElement("option");
+      o.value = sym; o.textContent = `${sym} — ${t.nom} (${t.devise})`; sel.append(o);
     });
-
-    document.getElementById("clear-button").addEventListener("click", () => {
-      if (positions.length > 0 && !confirm("Effacer tous les titres ?")) return;
-      positions = [];
-      savePositions();
-      render();
-    });
-
+    [$("date-achat"), $("date-vue")].forEach(i => { i.min = premiere; i.max = derniere; });
+    $("date-achat").value = derniere;
+    dateVue = derniere; $("date-vue").value = derniere;
+    $("maj").textContent = `Derniers prix de clôture disponibles : ${derniere}. Mis à jour automatiquement chaque soir de semaine.`;
     try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved !== null) {
-        const parsed = JSON.parse(saved);
-        if (!Array.isArray(parsed)) throw new TypeError("Le portefeuille enregistré n’est pas une liste.");
-        positions = parsed
-          .filter(position => position && typeof position === "object")
-          .map(position => ({
-            id: typeof position.id === "string" && position.id ? position.id : newId(),
-            ticker: typeof position.ticker === "string" ? position.ticker : "",
-            quantity: typeof position.quantity === "string" ? position.quantity : "",
-            currentPrice: typeof position.currentPrice === "string" ? position.currentPrice : "",
-            purchasePrice: typeof position.purchasePrice === "string" ? position.purchasePrice : ""
-          }));
-      }
-    } catch (error) {
-      status.textContent = "Les données enregistrées n’ont pas pu être lues dans ce navigateur.";
-    }
-
+      const saved = JSON.parse(localStorage.getItem(KEY) || "[]");
+      if (Array.isArray(saved)) achats = saved.filter(a => a && DATA.tickers[a.sym] && typeof a.qty === "number" && typeof a.date === "string");
+    } catch (e) {}
+    $("acheter").addEventListener("click", acheter);
+    $("date-vue").addEventListener("change", e => { dateVue = e.target.value || derniere; render(); });
+    $("aujourdhui").addEventListener("click", () => { dateVue = derniere; $("date-vue").value = derniere; render(); });
+    $("effacer").addEventListener("click", () => { if (achats.length && !confirm("Effacer tous les achats ?")) return; achats = []; sauver(); render(); });
     render();
-  </script>
+  }
+
+  fetch("prix.json", { cache: "no-store" })
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => { DATA = d; init(); })
+    .catch(() => {
+      $("maj").textContent = "Les prix n’ont pas pu être chargés (fichier prix.json introuvable). Voir les étapes de mise en place.";
+      $("maj").className = "error";
+    });
+</script>
 </body>
 </html>
